@@ -1,3 +1,5 @@
-module github.com/tadovas/go-elf
+module github.com/tadovas/elf
 
 go 1.14
+
+require github.com/stretchr/testify v1.6.1
