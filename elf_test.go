@@ -27,6 +27,6 @@ func TestElfReader(t *testing.T) {
 		assert.NoError(t, err)
 		header, err := Read(reader)
 		assert.NoError(t, err)
-		t.Logf("%+v", header)
+		t.Logf("%v -> %+v", tc.filename, header)
 	}
 }
