@@ -28,5 +28,20 @@ func TestElfReader(t *testing.T) {
 		header, err := Read(reader)
 		assert.NoError(t, err)
 		t.Logf("%v -> %+v", tc.filename, header)
+		nativeReader := header.NativeReader(reader)
+		var i uint16
+		t.Log("   --- Program header table ---")
+		for i = 0; i < header.ProgramHeaderTable.EntryCount; i++ {
+			programHeader, err := ReadProgramHeader(nativeReader)
+			assert.NoError(t, err)
+			t.Logf("   %+v", programHeader)
+		}
+		t.Log("   --- Section header table ---")
+		for i = 0; i < header.SectionHeaderTable.EntryCount; i++ {
+			sectionHeader, err := ReadSectionHeader(nativeReader)
+			assert.NoError(t, err)
+			t.Logf("   %+v", sectionHeader)
+		}
+
 	}
 }

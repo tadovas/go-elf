@@ -214,8 +214,8 @@ type Header struct {
 
 var ErrInvalidELF = errors.New("invalid ELF format")
 
-func Read(reader io.Reader) (*Header, error) {
-	header := &Header{}
+func Read(reader io.Reader) (Header, error) {
+	var header Header
 
 	var first4 [4]byte
 	_, err := io.ReadFull(reader, first4[:])
@@ -264,14 +264,8 @@ func Read(reader io.Reader) (*Header, error) {
 		return header, fmt.Errorf("%w padding read: %v", ErrInvalidELF, err)
 	}
 	// from this point any fields bigger than 1 byte need to be accessed by big/little endian semantics
-	intReader := LittleEndianReader(reader)
-	if header.Endianess == BigEndian {
-		intReader = BigEndianReader(reader)
-	}
-	nativeReader := NativeWordReader{
-		IntReader: intReader,
-		class:     header.Class,
-	}
+	nativeReader := header.NativeReader(reader)
+
 	uint16val, err := nativeReader.Uint16()
 	if err != nil {
 		return header, fmt.Errorf("%w object type read: %v", ErrInvalidELF, err)
@@ -346,6 +340,17 @@ func Read(reader io.Reader) (*Header, error) {
 	}
 
 	return header, nil
+}
+
+func (h Header) NativeReader(reader io.Reader) NativeWordReader {
+	intReader := LittleEndianReader(reader)
+	if h.Endianess == BigEndian {
+		intReader = BigEndianReader(reader)
+	}
+	return NativeWordReader{
+		IntReader: intReader,
+		Class:     h.Class,
+	}
 }
 
 func fillSizeCount(reader NativeWordReader, t *TableInfo) error {

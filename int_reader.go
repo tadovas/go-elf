@@ -73,17 +73,17 @@ func (ir IntReader) readBytes(size int) ([]byte, error) {
 }
 
 type NativeWordReader struct {
-	class ELFClass
+	Class ELFClass
 	IntReader
 }
 
 func (dwr NativeWordReader) ReadNativeWord() (uint64, error) {
-	switch dwr.class {
+	switch dwr.Class {
 	case ELFClass32:
 		val, err := dwr.Uint32()
 		return uint64(val), err
 	case ELFClass64:
 		return dwr.Uint64()
 	}
-	return 0, fmt.Errorf("unsupported class: %v", dwr.class)
+	return 0, fmt.Errorf("unsupported class: %v", dwr.Class)
 }
